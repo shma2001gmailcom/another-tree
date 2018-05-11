@@ -1,6 +1,8 @@
 package org.misha.tree;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.isEmpty;
@@ -34,17 +36,22 @@ public class MapNode<T> {
             for (final MapNode<T> c : children) {
                 final int parentDepth = c.getParent().depth();
                 sb.append("\n")
-                        .append(repeat("    ", parentDepth))
-                        .append(repeat("....", c.depth() - parentDepth))
+                        .append(repeat("|" + repeat(" ", 3), parentDepth))
+                        .append("|\n")
+                        .append(repeat("|" + repeat(" ", 3), parentDepth))
+                        .append(repeat("+" + repeat("-", 3), c.depth() - parentDepth))
                         .append(c.toRichString());
             }
         }
         return sb.toString();
     }
     
-    public void addChild(final MapNode<T> node) {
-        checkArgument(!table.containsKey(node), "already exists" + node);
-        table.put(node, this);
+    @SafeVarargs
+    public final void addChild(final MapNode<T>... node) {
+        for (final MapNode<T> n : node) {
+            checkArgument(!table.containsKey(n), "already exists" + n);
+            table.put(n, this);
+        }
     }
     
     public T getData() {

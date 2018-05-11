@@ -34,6 +34,9 @@ public class Launcher {
         final MapNode<String> node0013 = new MapNode<>(table, "0013");
         final MapNode<String> node0014 = new MapNode<>(table, "0014");
         final MapNode<String> node0002 = new MapNode<>(table, "0002");
+        final MapNode<String> node00020 = new MapNode<>(table, "00020");
+        final MapNode<String> node000200 = new MapNode<>(table, "000200");
+        final MapNode<String> node0002000 = new MapNode<>(table, "0002000");
         node0.addChild(node00);
         node0.addChild(node01);
         node0.addChild(node02);
@@ -44,6 +47,9 @@ public class Launcher {
         node01.addChild(node012);
         node001.addChild(node0010, node0011, node0012, node0013, node0014);
         node000.addChild(node0000, node0001, node0002);
+        node0002.addChild(node00020);
+        node00020.addChild(node000200);
+        node000200.addChild(node0002000);
         log.info("\n\n" + node0.toRichString());
         final List<String> found = new ArrayList<>();
         new Walker<String>(node0) {

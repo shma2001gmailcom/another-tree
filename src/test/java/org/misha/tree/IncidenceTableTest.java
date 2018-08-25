@@ -57,15 +57,21 @@ public class IncidenceTableTest {
     @Test
     public void testWalker() {
         final List<String> found = new ArrayList<>();
-        new Walker<String>(node0) {
-            
+        final Walker<String> walker = new Walker<String>(node0) {
             @Override
             protected void doSomethingWith(final MapNode<String> node) {
                 if (node.getData().endsWith("1")) {
                     found.add(node.getData());
                 }
             }
-        }.walk();
+        };
+        walker.walkWidth();
+        assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        walker.walkWidthUntil(n->n.getData().endsWith("1"));
+        assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        walker.walkDepth();
+        assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        walker.walkDepthUntil(n->n.getData().endsWith("1"));
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
     }
 }

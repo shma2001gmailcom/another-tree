@@ -52,15 +52,25 @@ public class Launcher {
         node000200.addChild(node0002000);
         log.info("\n\n" + node0.toRichString());
         final List<String> found = new ArrayList<>();
-        new Walker<String>(node0) {
-            
+        final Walker<String> walker = new Walker<String>(node0) {
             @Override
             protected void doSomethingWith(final MapNode<String> node) {
-                if (node.getData().endsWith("1")) {
+                if (node.getData().contains("01")) {
                     found.add(node.getData());
                 }
             }
-        }.walk();
+        };
+        walker.walkWidth();
         log.info(found);
+        found.clear();
+        walker.walkWidthUntil(n->n.getData().contains("01"));
+        log.info(found);
+        found.clear();
+        walker.walkDepth();
+        log.info(found);
+        found.clear();
+        walker.walkDepthUntil(n->n.getData().contains("01"));
+        log.info(found);
+        found.clear();
     }
 }

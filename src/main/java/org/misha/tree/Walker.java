@@ -26,7 +26,7 @@ public abstract class Walker<T> {
             final Node<T> removed = queue.removeFirst();
             doSomethingWith(removed);
             for (final Node<T> n : removed) {
-                queue.add(n);
+                queue.addLast(n);
             }
         }
     }
@@ -46,7 +46,7 @@ public abstract class Walker<T> {
     public void walkWidthUntil(final Predicate<Node<T>> stopCondition) {
         final LinkedList<Node<T>> queue = new LinkedList<>();
         queue.addFirst(node);
-        walk(stopCondition, queue, queue::add);
+        walk(stopCondition, queue, queue::addLast);
     }
 
     private void walk(final Predicate<Node<T>> stopCondition,

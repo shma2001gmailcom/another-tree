@@ -70,11 +70,14 @@ public class IncidenceRegistryTest {
         };
         walker.walkWidth();
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        found.clear();
         walker.walkWidthUntil(n->n.data().endsWith("1"));
-        assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        assertTrue(found.containsAll(Collections.singletonList("01")));
+        found.clear();
         walker.walkDepth();
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        found.clear();
         walker.walkDepthUntil(n->n.data().endsWith("1"));
-        assertTrue(found.containsAll(Arrays.asList("01", "001")));
+        assertTrue(found.containsAll(Collections.singletonList("01")));
     }
 }

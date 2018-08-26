@@ -23,7 +23,7 @@ public class MapNode<T> implements Node<T> {
         this.table = table;
     }
 
-    private static String repeat(String s, int times) {
+    private static String repeat(final String s, final int times) {
         return IntStream.range(0, times).mapToObj(i -> s).collect(Collectors.joining());
     }
 
@@ -64,6 +64,7 @@ public class MapNode<T> implements Node<T> {
 
     @Override
     public void forEachSiblings(final Consumer<? super Node<T>> consumer) {
+        //not implemented yet
     }
 
     @Nonnull
@@ -76,7 +77,7 @@ public class MapNode<T> implements Node<T> {
             @Override
             public boolean hasNext() {
                 while (iterator.hasNext()) {
-                    Map.Entry<Node<T>, Node<T>> entry = iterator.next();
+                    final Map.Entry<Node<T>, Node<T>> entry = iterator.next();
                     if (entry.getValue() == MapNode.this) {
                         node = entry.getKey();
                         return true;
@@ -87,6 +88,7 @@ public class MapNode<T> implements Node<T> {
 
             @Override
             public Node<T> next() {
+                if (node == null) throw new NoSuchElementException();
                 return node;
             }
         };
@@ -103,7 +105,7 @@ public class MapNode<T> implements Node<T> {
 
     @Override
     public boolean equals(final Object o) {
-        return this == o || o != null && getClass() == o.getClass() && data.equals(((MapNode) o).data);
+        return this == o || null != o && getClass() == o.getClass() && data.equals(((MapNode) o).data);
     }
 
     /**
@@ -126,7 +128,7 @@ public class MapNode<T> implements Node<T> {
     public int depth() {
         int result = 0;
         Node<T> parent = parent();
-        while (parent != null) {
+        while (null != parent) {
             parent = parent.parent();
             ++result;
         }

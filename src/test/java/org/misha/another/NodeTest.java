@@ -43,7 +43,7 @@ public class NodeTest {
 
     @Test
     public void testWalker() {
-        final List<Node<String>> found = new ArrayList<>();
+        final Collection<Node<String>> found = new ArrayList<>();
         final Walker<String> walker = new Walker<String>(node0) {
             @Override
             protected void doSomethingWith(final Node<String> node) {
@@ -53,7 +53,7 @@ public class NodeTest {
             }
         };
         walker.walkDepth();
-        Set<Node<String>> expected = ImmutableSet.of(node001, node01, node011);
+        final Set<Node<String>> expected = ImmutableSet.of(node001, node01, node011);
         assertTrue(expected.containsAll(found) && found.containsAll(expected));
         found.clear();
         walker.walkWidth();

@@ -2,6 +2,7 @@ package org.misha.tree;
 
 import org.misha.another.Node;
 
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -24,7 +25,7 @@ public abstract class Walker<T> {
         while (!queue.isEmpty()) {
             final Node<T> removed = queue.removeFirst();
             doSomethingWith(removed);
-            for (Node<T> n : removed) {
+            for (final Node<T> n : removed) {
                 queue.add(n);
             }
         }
@@ -36,7 +37,7 @@ public abstract class Walker<T> {
         while (!stack.isEmpty()) {
             final Node<T> removed = stack.removeFirst();
             doSomethingWith(removed);
-            for (Node<T> n : removed) {
+            for (final Node<T> n : removed) {
                 stack.addFirst(n);
             }
         }
@@ -49,14 +50,14 @@ public abstract class Walker<T> {
     }
 
     private void walk(final Predicate<Node<T>> stopCondition,
-                      final LinkedList<Node<T>> queue,
+                      final Deque<Node<T>> queue,
                       final Consumer<? super Node<T>> action
     ) {
         while (!queue.isEmpty()) {
             final Node<T> removed = queue.removeFirst();
             doSomethingWith(removed);
             if (stopCondition.test(removed)) return;
-            for (Node<T> n : removed) {
+            for (final Node<T> n : removed) {
                 action.accept(n);
             }
         }

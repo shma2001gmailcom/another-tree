@@ -7,7 +7,7 @@ import org.misha.tree.MapNode;
 import org.misha.tree.Walker;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * author: misha
@@ -16,7 +16,7 @@ import java.util.List;
 public class Launcher {
     private static final Logger log = Logger.getLogger(Launcher.class);
     
-    public static void main(String... args) {
+    public static void main(final String... args) {
         final IncidenceTable<String> table = new IncidenceTable<>();
         final MapNode<String> node0 = new MapNode<>(table, "0");
         final MapNode<String> node00 = new MapNode<>(table, "00");
@@ -52,7 +52,7 @@ public class Launcher {
         node00020.addChild(node000200);
         node000200.addChild(node0002000);
         log.info("\n\n" + node0.toRichString());
-        final List<String> found = new ArrayList<>();
+        final Collection<String> found = new ArrayList<>();
         final Walker<String> walker = new Walker<String>(node0) {
             @Override
             protected void doSomethingWith(final Node<String> node) {

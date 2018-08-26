@@ -38,7 +38,7 @@ public class IncidenceRegistryTest {
     @Test
     public void iterator() {
         final Iterator<Node<String>> iterator = node0.iterator();
-        final Set<Node<String>> actual = new HashSet<>();
+        final Collection<Node<String>> actual = new HashSet<>();
         while(iterator.hasNext()) {
             actual.add(iterator.next());
         }
@@ -59,7 +59,7 @@ public class IncidenceRegistryTest {
     
     @Test
     public void testWalker() {
-        final List<String> found = new ArrayList<>();
+        final Collection<String> found = new ArrayList<>();
         final Walker<String> walker = new Walker<String>(node0) {
             @Override
             protected void doSomethingWith(final Node<String> node) {

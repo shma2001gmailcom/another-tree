@@ -12,8 +12,10 @@ import java.util.function.Consumer;
 public interface Registry<T> extends Iterable<Map.Entry<Long, Long>> {
 
     @Nonnull
+    @Override
     Iterator<Map.Entry<Long, Long>> iterator();
 
+    @Override
     void forEach(Consumer<? super Map.Entry<Long, Long>> action);
 
     AtomicLong counter();

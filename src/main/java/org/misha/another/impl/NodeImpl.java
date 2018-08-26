@@ -43,7 +43,7 @@ final class NodeImpl implements Node<String>, Comparable<Node<String>> {
     @Override
     public Iterator<Node<String>> iterator() {
         final Set<Long> childIds = registry.getChildIds(id);
-        return childIds == null ?
+        return null == childIds ?
                new TreeSet<Node<String>>().iterator() :
                childIds.stream()
                        .mapToLong(l -> l)
@@ -62,8 +62,8 @@ final class NodeImpl implements Node<String>, Comparable<Node<String>> {
 
     public String toString() {
         final StringBuilder sb = new StringBuilder(data + "->[");
-        for (Iterator<Node<String>> it = iterator(); it.hasNext(); ) {
-            sb.append(it.next().toString()).append(it.hasNext() ? ", " : "");
+        for (final Iterator<Node<String>> it = iterator(); it.hasNext(); ) {
+            sb.append(it.next()).append(it.hasNext() ? ", " : "");
         }
         sb.append("]");
         return sb.toString();
@@ -75,6 +75,19 @@ final class NodeImpl implements Node<String>, Comparable<Node<String>> {
     }
 
     @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final NodeImpl nodes = (NodeImpl) o;
+        return id == nodes.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
+
+    @Override
     public Node<String> parent() {
         return registry.getNode(registry.getParent(id));
     }
@@ -82,7 +95,7 @@ final class NodeImpl implements Node<String>, Comparable<Node<String>> {
     @Override
     public void forEachSiblings(final Consumer<? super Node<String>> consumer) {
         final long parent = registry.getParent(id);
-        if (parent != -1) {
+        if (-1 != parent) {
             registry.getChildIds(parent).stream()
                     .filter(i -> i != id)
                     .map(registry::getNode)

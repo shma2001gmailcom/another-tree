@@ -1,6 +1,7 @@
 package org.misha;
 
 import org.apache.log4j.Logger;
+import org.misha.another.Node;
 import org.misha.tree.IncidenceTable;
 import org.misha.tree.MapNode;
 import org.misha.tree.Walker;
@@ -54,22 +55,22 @@ public class Launcher {
         final List<String> found = new ArrayList<>();
         final Walker<String> walker = new Walker<String>(node0) {
             @Override
-            protected void doSomethingWith(final MapNode<String> node) {
-                if (node.getData().contains("01")) {
-                    found.add(node.getData());
+            protected void doSomethingWith(final Node<String> node) {
+                if (node.data().contains("01")) {
+                    found.add(node.data());
                 }
             }
         };
         walker.walkWidth();
         log.info(found);
         found.clear();
-        walker.walkWidthUntil(n->n.getData().contains("01"));
+        walker.walkWidthUntil(n->n.data().contains("01"));
         log.info(found);
         found.clear();
         walker.walkDepth();
         log.info(found);
         found.clear();
-        walker.walkDepthUntil(n->n.getData().contains("01"));
+        walker.walkDepthUntil(n->n.data().contains("01"));
         log.info(found);
         found.clear();
     }

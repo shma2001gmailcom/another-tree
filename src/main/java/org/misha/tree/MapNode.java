@@ -1,106 +1,133 @@
 package org.misha.tree;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.misha.another.Node;
+
+import javax.annotation.Nonnull;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Iterables.isEmpty;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * author: misha
  * date: 5/8/18
  */
-public class MapNode<T> {
+public class MapNode<T> implements Node<T> {
     private final IncidenceTable<T> table;
     private final T data;
-    
+
     public MapNode(final IncidenceTable<T> table, final T data) {
         this.data = data;
         this.table = table;
     }
-    
+
     private static String repeat(String s, int times) {
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < times; ++i) {
-            sb.append(s);
-        }
-        return sb.toString();
+        return IntStream.range(0, times).mapToObj(i -> s).collect(Collectors.joining());
     }
-    
+
     public String toRichString() {
-        final StringBuilder sb = new StringBuilder(this.data.toString());
-        final List<MapNode<T>> children = this.children();
-        if (!children.isEmpty()) {
-            for (final MapNode<T> c : children) {
-                final int parentDepth = c.getParent().depth();
-                sb.append("\n")
-                        .append(repeat("|" + repeat(" ", 3), parentDepth))
-                        .append("|\n")
-                        .append(repeat("|" + repeat(" ", 3), parentDepth))
-                        .append(repeat("+" + repeat("-", 3), c.depth() - parentDepth))
-                        .append(c.toRichString());
-            }
-        }
+        final StringBuilder sb = new StringBuilder(data.toString());
+        forEach(c -> {
+            final int parentDepth = c.parent().depth();
+            sb.append("\n")
+              .append(repeat("|" + repeat(" ", 3), parentDepth))
+              .append("|\n")
+              .append(repeat("|" + repeat(" ", 3), parentDepth))
+              .append(repeat("+" + repeat("-", 3), c.depth() - parentDepth))
+              .append(c.toRichString());
+        });
         return sb.toString();
     }
-    
+
     @SafeVarargs
-    public final void addChild(final MapNode<T>... node) {
-        for (final MapNode<T> n : node) {
+    public final void addChild(final Node<T>... node) {
+        Arrays.stream(node).forEach(n -> {
             checkArgument(!table.containsKey(n), "already exists" + n);
             table.put(n, this);
-        }
+        });
     }
-    
-    public T getData() {
+
+    @Override
+    public long getId() {
+        return 0;
+    }
+
+    public T data() {
         return data;
     }
-    
-    MapNode<T> getParent() {
-        return table.getParentFor(this);
+
+    public Node<T> parent() {
+        return table.parent(this);
     }
-    
-    List<MapNode<T>> children() {
-        final List<MapNode<T>> result = new ArrayList<>();
-        try {
-            table.lockForRead();
-            for (final Map.Entry<MapNode<T>, MapNode<T>> e : table) {
-                if (e.getValue().equals(this)) {
-                    result.add(e.getKey());
+
+    @Override
+    public void forEachSiblings(final Consumer<? super Node<T>> consumer) {
+    }
+
+    @Nonnull
+    @Override
+    public Iterator<Node<T>> iterator() {
+        return new Iterator<Node<T>>() {
+            private final Iterator<Map.Entry<Node<T>, Node<T>>> iterator = table.iterator();
+            private Node<T> node;
+
+            @Override
+            public boolean hasNext() {
+                while (iterator.hasNext()) {
+                    Map.Entry<Node<T>, Node<T>> entry = iterator.next();
+                    if (entry.getValue() == MapNode.this) {
+                        node = entry.getKey();
+                        return true;
+                    }
                 }
+                return false;
             }
-        } finally {
-            table.readUnlock();
-        }
-        return result;
+
+            @Override
+            public Node<T> next() {
+                return node;
+            }
+        };
     }
-    
+
+    @Override
+    public void forEach(final Consumer<? super Node<T>> consumer) {
+        table.forEach(entry -> {
+            if (entry.getValue() == this) {
+                consumer.accept(entry.getKey());
+            }
+        });
+    }
+
     @Override
     public boolean equals(final Object o) {
         return this == o || o != null && getClass() == o.getClass() && data.equals(((MapNode) o).data);
     }
-    
+
+    /**
+     * do not add children of MapNode to its equals or hashCode
+     * because MapNode is used as key in Map
+     */
     @Override
     public int hashCode() {
         return data.hashCode();
     }
-    
+
     @Override
     public String toString() {
-        List<MapNode<T>> children = children();
         return "MapNode{" +
                 "data: " + data +
-                (isEmpty(children) ? EMPTY : "; children: " + children) +
                 '}';
     }
-    
-    private int depth() {
+
+    @Override
+    public int depth() {
         int result = 0;
-        MapNode<T> parent = getParent();
+        Node<T> parent = parent();
         while (parent != null) {
-            parent = parent.getParent();
+            parent = parent.parent();
             ++result;
         }
         return result;

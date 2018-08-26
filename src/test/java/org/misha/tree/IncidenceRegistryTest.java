@@ -1,20 +1,18 @@
 package org.misha.tree;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
+import org.misha.another.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * author: misha
  * date: 5/8/18
  */
-public class IncidenceTableTest {
-    private static final String EXPECTED = "MapNode{data: 0; children: [MapNode{data: 00; children: [MapNode{data: 000}, MapNode{data: 001}]}, MapNode{data: 01}, MapNode{data: 02}]}";
+public class IncidenceRegistryTest {
     private final MapNode<String> node0;
     private final MapNode<String> node00;
     private final MapNode<String> node01;
@@ -22,7 +20,7 @@ public class IncidenceTableTest {
     private final MapNode<String> node001;
     private final MapNode<String> node02;
     
-    public IncidenceTableTest() {
+    public IncidenceRegistryTest() {
         final IncidenceTable<String> table = new IncidenceTable<>();
         node0 = new MapNode<>(table, "0");
         node00 = new MapNode<>(table, "00");
@@ -39,18 +37,23 @@ public class IncidenceTableTest {
     
     @Test
     public void iterator() {
-        assertEquals(EXPECTED, node0.toString());
-        assertTrue(node0.getData().equals("0"));
+        final Iterator<Node<String>> iterator = node0.iterator();
+        final Set<Node<String>> actual = new HashSet<>();
+        while(iterator.hasNext()) {
+            actual.add(iterator.next());
+        }
+        final ImmutableSet<MapNode<String>> expected = ImmutableSet.of(node00, node01, node02);
+        assertTrue(expected.containsAll(actual) && actual.containsAll(expected));
     }
     
     @Test
     public void getParentFor() {
         assertTrue(
-                node001.getParent().equals(node00)
-                        && node000.getParent().equals(node00)
-                        && node02.getParent().equals(node0)
-                        && node01.getParent().equals(node0)
-                        && node00.getParent().equals(node0)
+                node001.parent().equals(node00)
+                        && node000.parent().equals(node00)
+                        && node02.parent().equals(node0)
+                        && node01.parent().equals(node0)
+                        && node00.parent().equals(node0)
         );
     }
     
@@ -59,19 +62,19 @@ public class IncidenceTableTest {
         final List<String> found = new ArrayList<>();
         final Walker<String> walker = new Walker<String>(node0) {
             @Override
-            protected void doSomethingWith(final MapNode<String> node) {
-                if (node.getData().endsWith("1")) {
-                    found.add(node.getData());
+            protected void doSomethingWith(final Node<String> node) {
+                if (node.data().endsWith("1")) {
+                    found.add(node.data());
                 }
             }
         };
         walker.walkWidth();
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
-        walker.walkWidthUntil(n->n.getData().endsWith("1"));
+        walker.walkWidthUntil(n->n.data().endsWith("1"));
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
         walker.walkDepth();
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
-        walker.walkDepthUntil(n->n.getData().endsWith("1"));
+        walker.walkDepthUntil(n->n.data().endsWith("1"));
         assertTrue(found.containsAll(Arrays.asList("01", "001")));
     }
 }

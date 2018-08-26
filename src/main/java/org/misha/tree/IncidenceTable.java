@@ -1,5 +1,7 @@
 package org.misha.tree;
 
+import org.misha.another.Node;
+
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,14 +9,15 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 /**
  * author: misha
  * date: 5/8/18
  * shows who is node's parent
  */
-public class IncidenceTable<T> implements Iterable<Map.Entry<MapNode<T>, MapNode<T>>> {
-    private final Map<MapNode<T>, MapNode<T>> table;
+public class IncidenceTable<T> implements Iterable<Map.Entry<Node<T>, Node<T>>> {
+    private final Map<Node<T>, Node<T>> table;
     private final ReadWriteLock lock;
     
     public IncidenceTable() {
@@ -22,7 +25,7 @@ public class IncidenceTable<T> implements Iterable<Map.Entry<MapNode<T>, MapNode
         lock = new ReentrantReadWriteLock();
     }
     
-    void put(final MapNode<T> child, final MapNode<T> parent) {
+    void put(final Node<T> child, final Node<T> parent) {
         final Lock writeLock = lock.writeLock();
         try {
             writeLock.lock();
@@ -32,7 +35,7 @@ public class IncidenceTable<T> implements Iterable<Map.Entry<MapNode<T>, MapNode
         }
     }
     
-    boolean containsKey(final MapNode<T> mapNode) {
+    boolean containsKey(final Node mapNode) {
         final Lock readLock = lock.readLock();
         try {
             readLock.lock();
@@ -44,11 +47,12 @@ public class IncidenceTable<T> implements Iterable<Map.Entry<MapNode<T>, MapNode
     
     @Nonnull
     @Override
-    public Iterator<Map.Entry<MapNode<T>, MapNode<T>>> iterator() {
+    public Iterator<Map.Entry<Node<T>, Node<T>>> iterator() {
         return table.entrySet().iterator();
     }
-    
-    public MapNode<T> getParentFor(final MapNode<T> node) {
+
+
+    Node<T> parent(final Node<T> node) {
         final Lock readLock = lock.readLock();
         try {
             readLock.lock();
@@ -64,7 +68,12 @@ public class IncidenceTable<T> implements Iterable<Map.Entry<MapNode<T>, MapNode
                 "table=" + table +
                 '}';
     }
-    
+
+    @Override
+    public void forEach(final Consumer<? super Map.Entry<Node<T>, Node<T>>> action) {
+        table.entrySet().forEach(action);
+    }
+
     void lockForRead() {
         lock.readLock().lock();
     }

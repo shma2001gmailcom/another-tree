@@ -1,7 +1,9 @@
 package org.misha.tree;
 
+import org.misha.another.Node;
+
 import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -10,58 +12,61 @@ import java.util.function.Predicate;
  * a non-recursive visitor
  */
 public abstract class Walker<T> {
-    private final MapNode<T> node;
+    private final Node<T> node;
 
-    protected Walker(final MapNode<T> node) {
+    protected Walker(final Node<T> node) {
         this.node = node;
     }
 
     public void walkWidth() {
-        final LinkedList<MapNode<T>> queue = new LinkedList<>();
+        final LinkedList<Node<T>> queue = new LinkedList<>();
         queue.addLast(node);
         while (!queue.isEmpty()) {
-            final MapNode<T> removed = queue.removeFirst();
+            final Node<T> removed = queue.removeFirst();
             doSomethingWith(removed);
-            queue.addAll(removed.children());
+            for (Node<T> n : removed) {
+                queue.add(n);
+            }
         }
     }
 
     public void walkDepth() {
-        final LinkedList<MapNode<T>> stack = new LinkedList<>();
+        final LinkedList<Node<T>> stack = new LinkedList<>();
         stack.addFirst(node);
         while (!stack.isEmpty()) {
-            final MapNode<T> removed = stack.removeFirst();
+            final Node<T> removed = stack.removeFirst();
             doSomethingWith(removed);
-            removed.children().forEach(stack::addFirst);
+            for (Node<T> n : removed) {
+                stack.addFirst(n);
+            }
         }
     }
 
-    public void walkWidthUntil(final Predicate<MapNode<T>> stopCondition) {
-        final LinkedList<MapNode<T>> queue = new LinkedList<>();
+    public void walkWidthUntil(final Predicate<Node<T>> stopCondition) {
+        final LinkedList<Node<T>> queue = new LinkedList<>();
         queue.addFirst(node);
+        walk(stopCondition, queue, queue::add);
+    }
+
+    private void walk(final Predicate<Node<T>> stopCondition,
+                      final LinkedList<Node<T>> queue,
+                      final Consumer<? super Node<T>> action
+    ) {
         while (!queue.isEmpty()) {
-            final MapNode<T> removed = queue.removeFirst();
+            final Node<T> removed = queue.removeFirst();
             doSomethingWith(removed);
             if (stopCondition.test(removed)) return;
-            queue.addAll(removed.children());
+            for (Node<T> n : removed) {
+                action.accept(n);
+            }
         }
     }
 
-    public void walkDepthUntil(final Predicate<MapNode<T>> stopCondition) {
-        final LinkedList<MapNode<T>> stack = new LinkedList<>();
+    public void walkDepthUntil(final Predicate<Node<T>> stopCondition) {
+        final LinkedList<Node<T>> stack = new LinkedList<>();
         stack.addFirst(node);
-        while (!stack.isEmpty()) {
-            final MapNode<T> removed = stack.removeFirst();
-            doSomethingWith(removed);
-            if (stopCondition.test(removed)) return;
-            removed.children().forEach(stack::addFirst);
-        }
+        walk(stopCondition, stack, stack::addFirst);
     }
 
-    protected abstract void doSomethingWith(final MapNode<T> remove);
-
-    private void printPocket(final List<MapNode<T>> list) {
-        System.err.println("\n==============");
-        list.forEach(node -> System.err.println(node.getData()));
-    }
+    protected abstract void doSomethingWith(final Node<T> remove);
 }

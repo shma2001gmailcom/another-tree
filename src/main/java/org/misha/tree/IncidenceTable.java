@@ -73,12 +73,4 @@ public class IncidenceTable<T> implements Iterable<Map.Entry<Node<T>, Node<T>>> 
     public void forEach(final Consumer<? super Map.Entry<Node<T>, Node<T>>> action) {
         table.entrySet().forEach(action);
     }
-
-    void lockForRead() {
-        lock.readLock().lock();
-    }
-    
-    void readUnlock() {
-        lock.readLock().unlock();
-    }
 }

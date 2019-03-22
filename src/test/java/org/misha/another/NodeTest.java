@@ -68,4 +68,13 @@ public class NodeTest {
         walker.walkDepthUntil(n -> n.data().endsWith("1"));
         assertTrue(found.containsAll(Collections.singletonList(node001)));
     }
+
+    @Test
+    public void testForEach() {
+        final StringBuilder sb = new StringBuilder();
+        node0.forEach(sb::append);
+        assertEquals("00->[001->[], 000->[]]01->[011->[], 010->[]]", sb.toString());
+        assertEquals("0->[01->[011->[], 010->[]], 00->[001->[], 000->[]]]", node0.toRichString());
+        assertEquals(0, node0.depth());
+    }
 }

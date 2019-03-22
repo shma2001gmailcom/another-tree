@@ -6,6 +6,7 @@ import org.misha.another.Node;
 
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -28,9 +29,7 @@ public class IncidenceRegistryTest {
         node000 = new MapNode<>(table, "000");
         node001 = new MapNode<>(table, "001");
         node02 = new MapNode<>(table, "02");
-        node0.addChild(node00);
-        node0.addChild(node01);
-        node0.addChild(node02);
+        node0.addChild(node00, node01, node02);
         node00.addChild(node000);
         node00.addChild(node001);
     }
@@ -79,5 +78,16 @@ public class IncidenceRegistryTest {
         found.clear();
         walker.walkDepthUntil(n->n.data().endsWith("1"));
         assertTrue(found.containsAll(Collections.singletonList("01")));
+    }
+
+    @Test
+    public void testToRichString() {
+        final StringBuilder sb = new StringBuilder();
+        node0.forEach(n->sb.append(n.toRichString()));
+        assertEquals("00\n" +
+                             "|   |\n" +
+                             "|   +---000\n" +
+                             "|   |\n" +
+                             "|   +---0010102", sb.toString());
     }
 }
